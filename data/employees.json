@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "last_name": "Иванов",
+    "first_name": "Иван",
+    "middle_name": "Иванович",
+    "email": "ivanov@onlanta.ru",
+    "phone": "+7 (999) 123-45-67",
+    "department": "Отдел разработки",
+    "position": "Старший разработчик"
+  },
+  {
+    "id": 2,
+    "last_name": "Петрова",
+    "first_name": "Мария",
+    "middle_name": "Сергеевна",
+    "email": "petrova@onlanta.ru",
+    "phone": "+7 (999) 234-56-78",
+    "department": "Отдел маркетинга",
+    "position": "Маркетолог"
+  },
+  {
+    "id": 3,
+    "last_name": "Сидоров",
+    "first_name": "Алексей",
+    "middle_name": "Петрович",
+    "email": "sidorov@onlanta.ru",
+    "phone": "+7 (999) 345-67-89",
+    "department": "IT-отдел",
+    "position": "Системный администратор"
+  },
+  {
+    "id": 4,
+    "last_name": "Козлова",
+    "first_name": "Елена",
+    "middle_name": "Александровна",
+    "email": "kozlova@onlanta.ru",
+    "phone": "+7 (999) 456-78-90",
+    "department": "Бухгалтерия",
+    "position": "Главный бухгалтер"
+  },
+  {
+    "id": 5,
+    "last_name": "Николаев",
+    "first_name": "Дмитрий",
+    "middle_name": "Владимирович",
+    "email": "nikolaev@onlanta.ru",
+    "phone": "+7 (999) 567-89-01",
+    "department": "Отдел продаж",
+    "position": "Менеджер по продажам"
+  },
+  {
+    "id": 6,
+    "last_name": "Смирнова",
+    "first_name": "Анна",
+    "middle_name": "Дмитриевна",
+    "email": "smirnova@onlanta.ru",
+    "phone": "+7 (999) 678-90-12",
+    "department": "HR-отдел",
+    "position": "HR-менеджер"
+  },
+  {
+    "id": 7,
+    "last_name": "Волков",
+    "first_name": "Сергей",
+    "middle_name": "Николаевич",
+    "email": "volkov@onlanta.ru",
+    "phone": "+7 (999) 789-01-23",
+    "department": "Отдел безопасности",
+    "position": "Специалист по ИБ"
+  },
+  {
+    "id": 8,
+    "last_name": "Морозова",
+    "first_name": "Ольга",
+    "middle_name": "Игоревна",
+    "email": "morozova@onlanta.ru",
+    "phone": "+7 (999) 890-12-34",
+    "department": "Юридический отдел",
+    "position": "Юрист"
+  }
+]

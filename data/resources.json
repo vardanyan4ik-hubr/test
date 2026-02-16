@@ -1,0 +1,14 @@
+[
+  {"id": 1, "title": "Интранет", "url": "https://intranet.onlanta.ru", "description": "Корпоративный портал"},
+  {"id": 2, "title": "Confluence", "url": "https://confluence.onlanta.ru", "description": "База знаний"},
+  {"id": 3, "title": "Jira", "url": "https://jira.onlanta.ru", "description": "Управление задачами"},
+  {"id": 4, "title": "GitLab", "url": "https://gitlab.onlanta.ru", "description": "Репозиторий кода"},
+  {"id": 5, "title": "Почта", "url": "https://mail.onlanta.ru", "description": "Корпоративная почта"},
+  {"id": 6, "title": "1С", "url": "https://1c.onlanta.ru", "description": "Система учёта"},
+  {"id": 7, "title": "Service Desk", "url": "https://sd.onlanta.ru", "description": "Техподдержка"},
+  {"id": 8, "title": "Обучение", "url": "https://edu.onlanta.ru", "description": "Платформа обучения"},
+  {"id": 9, "title": "HR-портал", "url": "https://hr.onlanta.ru", "description": "Кадровый портал"},
+  {"id": 10, "title": "Wiki", "url": "https://wiki.onlanta.ru", "description": "Внутренняя вики"},
+  {"id": 11, "title": "Мониторинг", "url": "https://monitoring.onlanta.ru", "description": "Система мониторинга"},
+  {"id": 12, "title": "VPN", "url": "https://vpn.onlanta.ru", "description": "VPN-доступ"}
+]
