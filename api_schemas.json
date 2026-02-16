@@ -1,0 +1,721 @@
+{
+  "api_version": "1.0",
+  "schemas": {
+    "auth": {
+      "auth_request": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["auth_start"],
+            "description": "Действие авторизации"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "ID пользователя в MAX"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Время запроса"
+          }
+        },
+        "required": ["action", "user_id", "timestamp"]
+      },
+      "auth_response_success": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["success"]
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "user_id": {"type": "string"},
+              "username": {"type": "string"},
+              "email": {"type": "string", "format": "email"},
+              "full_name": {"type": "string"},
+              "department": {"type": "string"},
+              "position": {"type": "string"},
+              "is_manager": {"type": "boolean"}
+            },
+            "required": ["user_id", "username", "email", "full_name"]
+          },
+          "session": {
+            "type": "object",
+            "properties": {
+              "session_id": {"type": "string"},
+              "created_at": {"type": "string", "format": "date-time"},
+              "expires_at": {"type": "string", "format": "date-time"}
+            },
+            "required": ["session_id", "created_at", "expires_at"]
+          }
+        },
+        "required": ["status", "user", "session"]
+      },
+      "auth_response_error": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["error"]
+          },
+          "error_code": {
+            "type": "string",
+            "enum": ["AUTH_FAILED", "INVALID_TOKEN", "USER_BLOCKED"]
+          },
+          "error_message": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"}
+        },
+        "required": ["status", "error_code", "error_message", "timestamp"]
+      }
+    },
+    "employees": {
+      "search_request": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["search_employee"]
+          },
+          "user_id": {"type": "string"},
+          "query": {
+            "type": "object",
+            "properties": {
+              "lastname": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 50,
+                "pattern": "^[А-Яа-яA-Za-z\\s\\-]+$"
+              },
+              "search_type": {
+                "type": "string",
+                "enum": ["lastname", "fullname", "email"]
+              }
+            },
+            "required": ["lastname", "search_type"]
+          },
+          "timestamp": {"type": "string", "format": "date-time"}
+        },
+        "required": ["action", "user_id", "query"]
+      },
+      "search_response_single": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "result_count": {"type": "integer", "minimum": 1, "maximum": 1},
+          "employees": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "employee_id": {"type": "string"},
+                "full_name": {"type": "string"},
+                "lastname": {"type": "string"},
+                "firstname": {"type": "string"},
+                "middlename": {"type": "string"},
+                "department": {"type": "string"},
+                "position": {"type": "string"},
+                "email": {"type": "string", "format": "email"},
+                "phone": {"type": "string"},
+                "office": {
+                  "type": "object",
+                  "properties": {
+                    "city": {"type": "string"},
+                    "building": {"type": "string"},
+                    "floor": {"type": "string"}
+                  }
+                },
+                "photo_url": {"type": "string", "format": "uri"}
+              },
+              "required": ["employee_id", "full_name", "department", "position"]
+            },
+            "minItems": 1,
+            "maxItems": 1
+          }
+        },
+        "required": ["status", "result_count", "employees"]
+      },
+      "search_response_multiple": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "result_count": {"type": "integer", "minimum": 2, "maximum": 10},
+          "employees": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "employee_id": {"type": "string"},
+                "full_name": {"type": "string"},
+                "department": {"type": "string"},
+                "position": {"type": "string"}
+              },
+              "required": ["employee_id", "full_name", "department", "position"]
+            },
+            "minItems": 2,
+            "maxItems": 10
+          }
+        },
+        "required": ["status", "result_count", "employees"]
+      },
+      "search_response_not_found": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "result_count": {"type": "integer", "enum": [0]},
+          "employees": {"type": "array", "items": {}, "maxItems": 0}
+        },
+        "required": ["status", "result_count", "employees"]
+      },
+      "search_response_error": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["error"]},
+          "error_code": {
+            "type": "string",
+            "enum": ["VALIDATION_ERROR", "DATABASE_ERROR", "INTERNAL_ERROR"]
+          },
+          "error_message": {"type": "string"},
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {"type": "string"},
+                "message": {"type": "string"}
+              },
+              "required": ["field", "message"]
+            }
+          }
+        },
+        "required": ["status", "error_code", "error_message"]
+      }
+    },
+    "resources": {
+      "get_resources_request": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["get_resources"]
+          },
+          "user_id": {"type": "string"},
+          "page": {"type": "integer", "minimum": 1},
+          "per_page": {"type": "integer", "minimum": 1, "maximum": 10, "default": 5}
+        },
+        "required": ["action", "user_id", "page"]
+      },
+      "get_resources_response": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "current_page": {"type": "integer", "minimum": 1},
+              "total_pages": {"type": "integer", "minimum": 1},
+              "per_page": {"type": "integer"},
+              "total_items": {"type": "integer", "minimum": 0}
+            },
+            "required": ["current_page", "total_pages", "per_page", "total_items"]
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_id": {"type": "string"},
+                "title": {"type": "string"},
+                "url": {"type": "string", "format": "uri"},
+                "description": {"type": "string"},
+                "category": {"type": "string"},
+                "icon": {"type": "string"}
+              },
+              "required": ["resource_id", "title", "url"]
+            },
+            "maxItems": 10
+          }
+        },
+        "required": ["status", "pagination", "resources"]
+      }
+    },
+    "vacation": {
+      "get_vacation_info_request": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["get_vacation_info"]
+          },
+          "user_id": {"type": "string"},
+          "employee_id": {"type": "string"},
+          "year": {"type": "integer", "minimum": 2020, "maximum": 2100}
+        },
+        "required": ["action", "user_id", "employee_id", "year"]
+      },
+      "get_vacation_info_response": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "vacation_info": {
+            "type": "object",
+            "properties": {
+              "employee": {
+                "type": "object",
+                "properties": {
+                  "employee_id": {"type": "string"},
+                  "full_name": {"type": "string"},
+                  "hire_date": {"type": "string", "format": "date"}
+                },
+                "required": ["employee_id", "full_name"]
+              },
+              "year": {"type": "integer"},
+              "total_days": {"type": "integer"},
+              "used_days": {"type": "integer"},
+              "remaining_days": {"type": "integer"},
+              "planned_vacations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "vacation_id": {"type": "string"},
+                    "start_date": {"type": "string", "format": "date"},
+                    "end_date": {"type": "string", "format": "date"},
+                    "days": {"type": "integer"},
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "approved", "rejected", "cancelled"]
+                    },
+                    "approved_by": {"type": "string"},
+                    "approved_at": {"type": "string", "format": "date-time"}
+                  },
+                  "required": ["vacation_id", "start_date", "end_date", "days", "status"]
+                }
+              },
+              "vacation_rules": {
+                "type": "object",
+                "properties": {
+                  "min_continuous_days": {"type": "integer"},
+                  "request_days_before": {"type": "integer"},
+                  "payment_days_before": {"type": "integer"}
+                }
+              }
+            },
+            "required": ["employee", "year", "total_days", "used_days", "remaining_days"]
+          }
+        },
+        "required": ["status", "vacation_info"]
+      }
+    },
+    "wifi": {
+      "get_wifi_passwords_request": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["get_wifi_passwords"]
+          },
+          "user_id": {"type": "string"},
+          "employee_id": {"type": "string"},
+          "office_location": {
+            "type": "string",
+            "enum": ["moscow", "spb", "remote"]
+          }
+        },
+        "required": ["action", "user_id", "employee_id"]
+      },
+      "get_wifi_passwords_response": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "wifi_networks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "network_id": {"type": "string"},
+                "office": {"type": "string"},
+                "ssid": {"type": "string"},
+                "password": {"type": "string"},
+                "type": {
+                  "type": "string",
+                  "enum": ["corporate", "guest"]
+                },
+                "security": {
+                  "type": "string",
+                  "enum": ["WPA2-Enterprise", "WPA2-PSK", "WPA3"]
+                }
+              },
+              "required": ["network_id", "ssid", "password", "type"]
+            }
+          },
+          "security_notice": {"type": "string"},
+          "logged_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["status", "wifi_networks", "logged_at"]
+      }
+    },
+    "contractors": {
+      "get_contractor_report_request": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["get_contractor_report"]
+          },
+          "user_id": {"type": "string"},
+          "query": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["inn", "name"]
+              },
+              "value": {"type": "string"}
+            },
+            "required": ["type", "value"]
+          },
+          "timestamp": {"type": "string", "format": "date-time"}
+        },
+        "required": ["action", "user_id", "query"]
+      },
+      "get_contractor_report_response": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "contractor": {
+            "type": "object",
+            "properties": {
+              "contractor_id": {"type": "string"},
+              "legal_name": {"type": "string"},
+              "inn": {
+                "type": "string",
+                "pattern": "^\\d{10}$|^\\d{12}$"
+              },
+              "kpp": {
+                "type": "string",
+                "pattern": "^\\d{9}$"
+              },
+              "ogrn": {
+                "type": "string",
+                "pattern": "^\\d{13}$|^\\d{15}$"
+              },
+              "legal_address": {"type": "string"},
+              "cooperation": {
+                "type": "object",
+                "properties": {
+                  "start_date": {"type": "string", "format": "date"},
+                  "is_active": {"type": "boolean"},
+                  "turnover_current_year": {"type": "number", "minimum": 0},
+                  "deals_count": {"type": "integer", "minimum": 0},
+                  "last_payment_date": {"type": "string", "format": "date"}
+                }
+              },
+              "status": {
+                "type": "object",
+                "properties": {
+                  "has_debt": {"type": "boolean"},
+                  "debt_amount": {"type": "number", "minimum": 0},
+                  "documents_status": {
+                    "type": "string",
+                    "enum": ["complete", "incomplete", "expired"]
+                  },
+                  "risk_level": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"]
+                  }
+                }
+              },
+              "contact_person": {
+                "type": "object",
+                "properties": {
+                  "full_name": {"type": "string"},
+                  "phone": {"type": "string"},
+                  "email": {"type": "string", "format": "email"},
+                  "position": {"type": "string"}
+                }
+              }
+            },
+            "required": ["contractor_id", "legal_name", "inn"]
+          }
+        },
+        "required": ["status", "contractor"]
+      },
+      "get_contractor_report_error": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["error"]},
+          "error_code": {
+            "type": "string",
+            "enum": ["CONTRACTOR_NOT_FOUND", "INVALID_INN", "ACCESS_DENIED"]
+          },
+          "error_message": {"type": "string"}
+        },
+        "required": ["status", "error_code", "error_message"]
+      }
+    },
+    "manager": {
+      "get_subordinates_request": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["get_subordinates"]
+          },
+          "user_id": {"type": "string"},
+          "manager_id": {"type": "string"}
+        },
+        "required": ["action", "user_id", "manager_id"]
+      },
+      "get_subordinates_response": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "manager": {
+            "type": "object",
+            "properties": {
+              "employee_id": {"type": "string"},
+              "full_name": {"type": "string"},
+              "department": {"type": "string"},
+              "position": {"type": "string"}
+            },
+            "required": ["employee_id", "full_name"]
+          },
+          "subordinates_count": {"type": "integer", "minimum": 0},
+          "subordinates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "employee_id": {"type": "string"},
+                "full_name": {"type": "string"},
+                "position": {"type": "string"},
+                "status": {
+                  "type": "string",
+                  "enum": ["working", "on_vacation", "sick_leave", "remote"]
+                },
+                "on_vacation": {"type": "boolean"},
+                "vacation_until": {"type": "string", "format": "date"}
+              },
+              "required": ["employee_id", "full_name", "position", "status"]
+            }
+          }
+        },
+        "required": ["status", "manager", "subordinates_count", "subordinates"]
+      }
+    },
+    "messages": {
+      "send_message_request": {
+        "type": "object",
+        "properties": {
+          "chat_id": {"type": "string"},
+          "text": {"type": "string"},
+          "parse_mode": {
+            "type": "string",
+            "enum": ["Markdown", "HTML", "MarkdownV2"]
+          },
+          "reply_markup": {
+            "type": "object",
+            "properties": {
+              "inline_keyboard": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "text": {"type": "string"},
+                      "callback_data": {"type": "string"},
+                      "url": {"type": "string", "format": "uri"}
+                    },
+                    "required": ["text"],
+                    "oneOf": [
+                      {"required": ["callback_data"]},
+                      {"required": ["url"]}
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": ["chat_id", "text"]
+      },
+      "send_message_response": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success"]},
+          "message_id": {"type": "integer"},
+          "sent_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["status", "message_id", "sent_at"]
+      }
+    },
+    "webhooks": {
+      "max_webhook_message": {
+        "type": "object",
+        "properties": {
+          "update_id": {"type": "integer"},
+          "message": {
+            "type": "object",
+            "properties": {
+              "message_id": {"type": "integer"},
+              "from": {
+                "type": "object",
+                "properties": {
+                  "user_id": {"type": "string"},
+                  "username": {"type": "string"},
+                  "full_name": {"type": "string"}
+                },
+                "required": ["user_id"]
+              },
+              "chat": {
+                "type": "object",
+                "properties": {
+                  "chat_id": {"type": "string"},
+                  "type": {
+                    "type": "string",
+                    "enum": ["private", "group", "channel"]
+                  }
+                },
+                "required": ["chat_id", "type"]
+              },
+              "date": {"type": "integer"},
+              "text": {"type": "string"}
+            },
+            "required": ["message_id", "from", "chat", "date"]
+          }
+        },
+        "required": ["update_id", "message"]
+      },
+      "max_webhook_callback": {
+        "type": "object",
+        "properties": {
+          "update_id": {"type": "integer"},
+          "callback_query": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string"},
+              "from": {
+                "type": "object",
+                "properties": {
+                  "user_id": {"type": "string"},
+                  "username": {"type": "string"}
+                },
+                "required": ["user_id"]
+              },
+              "message": {
+                "type": "object",
+                "properties": {
+                  "message_id": {"type": "integer"},
+                  "chat": {
+                    "type": "object",
+                    "properties": {
+                      "chat_id": {"type": "string"}
+                    },
+                    "required": ["chat_id"]
+                  }
+                },
+                "required": ["message_id", "chat"]
+              },
+              "data": {"type": "string"}
+            },
+            "required": ["id", "from", "message", "data"]
+          }
+        },
+        "required": ["update_id", "callback_query"]
+      }
+    },
+    "menu": {
+      "menu_structure": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["show_menu"]
+          },
+          "user_id": {"type": "string"},
+          "menu_items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string"},
+                "label": {"type": "string"},
+                "callback_data": {"type": "string"},
+                "enabled": {"type": "boolean"},
+                "disabled_text": {"type": "string"},
+                "required_role": {
+                  "type": "string",
+                  "enum": ["all", "manager", "hr", "finance"]
+                }
+              },
+              "required": ["id", "label", "callback_data", "enabled"]
+            }
+          }
+        },
+        "required": ["action", "user_id", "menu_items"]
+      }
+    },
+    "errors": {
+      "validation_error": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["error"]},
+          "error_code": {"type": "string", "enum": ["VALIDATION_ERROR"]},
+          "error_message": {"type": "string"},
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {"type": "string"},
+                "message": {"type": "string"},
+                "value": {"type": "string"}
+              },
+              "required": ["field", "message"]
+            }
+          }
+        },
+        "required": ["status", "error_code", "error_message"]
+      },
+      "access_denied_error": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["error"]},
+          "error_code": {"type": "string", "enum": ["ACCESS_DENIED"]},
+          "error_message": {"type": "string"},
+          "required_role": {"type": "string"}
+        },
+        "required": ["status", "error_code", "error_message"]
+      },
+      "internal_error": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["error"]},
+          "error_code": {
+            "type": "string",
+            "enum": ["INTERNAL_ERROR", "DATABASE_ERROR", "EXTERNAL_API_ERROR"]
+          },
+          "error_message": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"}
+        },
+        "required": ["status", "error_code", "error_message", "timestamp"]
+      },
+      "not_found_error": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["error"]},
+          "error_code": {
+            "type": "string",
+            "enum": ["NOT_FOUND", "EMPLOYEE_NOT_FOUND", "CONTRACTOR_NOT_FOUND", "RESOURCE_NOT_FOUND"]
+          },
+          "error_message": {"type": "string"}
+        },
+        "required": ["status", "error_code", "error_message"]
+      }
+    }
+  }
+}

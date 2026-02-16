@@ -1,0 +1,290 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # Main Bot Application
+  # ==========================================
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mikhalych_bot
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      # Database
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-mikhalych_bot}
+      - DB_USER=${DB_USER:-bot_user}
+      - DB_PASSWORD=${DB_PASSWORD:-secure_password}
+      
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+      
+      # MAX API
+      - MAX_API_URL=${MAX_API_URL}
+      - MAX_BOT_TOKEN=${MAX_BOT_TOKEN}
+      - MAX_WEBHOOK_SECRET=${MAX_WEBHOOK_SECRET}
+      
+      # External APIs
+      - HR_SYSTEM_API_URL=${HR_SYSTEM_API_URL}
+      - HR_SYSTEM_API_KEY=${HR_SYSTEM_API_KEY}
+      - 1C_API_URL=${1C_API_URL}
+      - 1C_API_USER=${1C_API_USER}
+      - 1C_API_PASSWORD=${1C_API_PASSWORD}
+      
+      # Security
+      - SECRET_KEY=${SECRET_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      
+      # App settings
+      - APP_ENV=production
+      - DEBUG=false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/var/log/mikhalych_bot
+      - ./app:/app/app
+    networks:
+      - mikhalych_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # PostgreSQL Database
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: mikhalych_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-mikhalych_bot}
+      POSTGRES_USER: ${DB_USER:-bot_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=ru_RU.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - mikhalych_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bot_user} -d ${DB_NAME:-mikhalych_bot}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # Redis Cache
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: mikhalych_redis
+    restart: always
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD:-redis_password}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 60 1000
+      --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - mikhalych_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ==========================================
+  # Celery Worker (Background Tasks)
+  # ==========================================
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mikhalych_celery_worker
+    restart: always
+    command: celery -A app.celery_app worker --loglevel=info
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./logs:/var/log/mikhalych_bot
+      - ./app:/app/app
+    networks:
+      - mikhalych_network
+
+  # ==========================================
+  # Celery Beat (Scheduler)
+  # ==========================================
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mikhalych_celery_beat
+    restart: always
+    command: celery -A app.celery_app beat --loglevel=info
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./logs:/var/log/mikhalych_bot
+      - ./app:/app/app
+    networks:
+      - mikhalych_network
+
+  # ==========================================
+  # Flower (Celery Monitoring)
+  # ==========================================
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mikhalych_flower
+    restart: always
+    command: celery -A app.celery_app flower --port=5555
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - mikhalych_network
+
+  # ==========================================
+  # Prometheus (Metrics)
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mikhalych_prometheus
+    restart: always
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - mikhalych_network
+
+  # ==========================================
+  # Grafana (Visualization)
+  # ==========================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mikhalych_grafana
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - mikhalych_network
+
+  # ==========================================
+  # PgAdmin (Database Management)
+  # ==========================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: mikhalych_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@onlanta.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - mikhalych_network
+
+  # ==========================================
+  # Nginx (Reverse Proxy)
+  # ==========================================
+  nginx:
+    image: nginx:alpine
+    container_name: mikhalych_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - bot
+    networks:
+      - mikhalych_network
+
+# ==========================================
+# Networks
+# ==========================================
+networks:
+  mikhalych_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+# ==========================================
+# Volumes
+# ==========================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  pgadmin_data:
+    driver: local

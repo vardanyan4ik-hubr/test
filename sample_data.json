@@ -1,0 +1,586 @@
+{
+  "description": "Примеры данных для тестирования и инициализации базы данных чат-бота Михалыч",
+  "version": "1.0.0",
+  "sample_users": [
+    {
+      "user_id": "max_user_001",
+      "employee_id": "emp_001",
+      "username": "ivanov_ivan",
+      "email": "ivanov@onlanta.com",
+      "full_name": "Иванов Иван Иванович",
+      "is_active": true,
+      "created_at": "2026-01-15T09:00:00Z",
+      "last_activity": "2026-02-16T10:30:00Z"
+    },
+    {
+      "user_id": "max_user_002",
+      "employee_id": "emp_002",
+      "username": "petrova_anna",
+      "email": "petrova@onlanta.com",
+      "full_name": "Петрова Анна Сергеевна",
+      "is_active": true,
+      "created_at": "2026-01-16T10:00:00Z",
+      "last_activity": "2026-02-16T11:00:00Z"
+    },
+    {
+      "user_id": "max_user_003",
+      "employee_id": "emp_003",
+      "username": "sidorov_petr",
+      "email": "sidorov@onlanta.com",
+      "full_name": "Сидоров Петр Александрович",
+      "is_active": true,
+      "created_at": "2026-01-17T11:00:00Z",
+      "last_activity": "2026-02-15T16:45:00Z"
+    }
+  ],
+  "sample_employees": [
+    {
+      "employee_id": "emp_001",
+      "lastname": "Иванов",
+      "firstname": "Иван",
+      "middlename": "Иванович",
+      "full_name": "Иванов Иван Иванович",
+      "department": "IT-департамент",
+      "position": "Старший разработчик",
+      "email": "ivanov@onlanta.com",
+      "phone": "+7 (999) 123-45-67",
+      "office_city": "Москва",
+      "office_building": "БЦ \"Онланта\"",
+      "office_floor": "5",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_001.jpg",
+      "is_manager": false,
+      "manager_id": "emp_manager_01",
+      "hire_date": "2020-03-15",
+      "is_active": true
+    },
+    {
+      "employee_id": "emp_002",
+      "lastname": "Петрова",
+      "firstname": "Анна",
+      "middlename": "Сергеевна",
+      "full_name": "Петрова Анна Сергеевна",
+      "department": "IT-департамент",
+      "position": "Руководитель отдела разработки",
+      "email": "petrova@onlanta.com",
+      "phone": "+7 (999) 234-56-78",
+      "office_city": "Москва",
+      "office_building": "БЦ \"Онланта\"",
+      "office_floor": "5",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_002.jpg",
+      "is_manager": true,
+      "manager_id": null,
+      "hire_date": "2018-06-01",
+      "is_active": true
+    },
+    {
+      "employee_id": "emp_003",
+      "lastname": "Сидоров",
+      "firstname": "Петр",
+      "middlename": "Александрович",
+      "full_name": "Сидоров Петр Александрович",
+      "department": "IT-департамент",
+      "position": "Разработчик",
+      "email": "sidorov@onlanta.com",
+      "phone": "+7 (999) 345-67-89",
+      "office_city": "Москва",
+      "office_building": "БЦ \"Онланта\"",
+      "office_floor": "5",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_003.jpg",
+      "is_manager": false,
+      "manager_id": "emp_manager_01",
+      "hire_date": "2021-09-01",
+      "is_active": true
+    },
+    {
+      "employee_id": "emp_004",
+      "lastname": "Смирнова",
+      "firstname": "Мария",
+      "middlename": "Петровна",
+      "full_name": "Смирнова Мария Петровна",
+      "department": "HR",
+      "position": "HR-менеджер",
+      "email": "smirnova@onlanta.com",
+      "phone": "+7 (999) 456-78-90",
+      "office_city": "Москва",
+      "office_building": "БЦ \"Онланта\"",
+      "office_floor": "3",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_004.jpg",
+      "is_manager": false,
+      "manager_id": "emp_manager_02",
+      "hire_date": "2019-04-10",
+      "is_active": true
+    },
+    {
+      "employee_id": "emp_005",
+      "lastname": "Козлов",
+      "firstname": "Александр",
+      "middlename": "Игоревич",
+      "full_name": "Козлов Александр Игоревич",
+      "department": "Финансы",
+      "position": "Главный бухгалтер",
+      "email": "kozlov@onlanta.com",
+      "phone": "+7 (999) 567-89-01",
+      "office_city": "Москва",
+      "office_building": "БЦ \"Онланта\"",
+      "office_floor": "4",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_005.jpg",
+      "is_manager": true,
+      "manager_id": null,
+      "hire_date": "2017-02-20",
+      "is_active": true
+    },
+    {
+      "employee_id": "emp_006",
+      "lastname": "Новикова",
+      "firstname": "Елена",
+      "middlename": "Викторовна",
+      "full_name": "Новикова Елена Викторовна",
+      "department": "Маркетинг",
+      "position": "Маркетолог",
+      "email": "novikova@onlanta.com",
+      "phone": "+7 (999) 678-90-12",
+      "office_city": "Санкт-Петербург",
+      "office_building": "БЦ \"Северная Столица\"",
+      "office_floor": "2",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_006.jpg",
+      "is_manager": false,
+      "manager_id": "emp_manager_03",
+      "hire_date": "2020-07-15",
+      "is_active": true
+    },
+    {
+      "employee_id": "emp_007",
+      "lastname": "Волков",
+      "firstname": "Дмитрий",
+      "middlename": "Сергеевич",
+      "full_name": "Волков Дмитрий Сергеевич",
+      "department": "IT-департамент",
+      "position": "DevOps инженер",
+      "email": "volkov@onlanta.com",
+      "phone": "+7 (999) 789-01-23",
+      "office_city": "Москва",
+      "office_building": "БЦ \"Онланта\"",
+      "office_floor": "5",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_007.jpg",
+      "is_manager": false,
+      "manager_id": "emp_manager_01",
+      "hire_date": "2021-01-10",
+      "is_active": true
+    },
+    {
+      "employee_id": "emp_008",
+      "lastname": "Морозова",
+      "firstname": "Ольга",
+      "middlename": "Андреевна",
+      "full_name": "Морозова Ольга Андреевна",
+      "department": "HR",
+      "position": "Руководитель отдела кадров",
+      "email": "morozova@onlanta.com",
+      "phone": "+7 (999) 890-12-34",
+      "office_city": "Москва",
+      "office_building": "БЦ \"Онланта\"",
+      "office_floor": "3",
+      "photo_url": "https://cdn.onlanta.com/photos/emp_008.jpg",
+      "is_manager": true,
+      "manager_id": null,
+      "hire_date": "2016-05-01",
+      "is_active": true
+    }
+  ],
+  "sample_contractors": [
+    {
+      "contractor_id": "cont_001",
+      "legal_name": "ООО \"Ромашка\"",
+      "inn": "7701234567",
+      "kpp": "770101001",
+      "ogrn": "1027701234567",
+      "legal_address": "125009, г. Москва, ул. Тверская, д. 1",
+      "cooperation": {
+        "start_date": "2020-03-15",
+        "is_active": true,
+        "turnover_current_year": 5450000.00,
+        "deals_count": 127,
+        "last_payment_date": "2026-02-10"
+      },
+      "status": {
+        "has_debt": false,
+        "debt_amount": 0.00,
+        "documents_status": "complete",
+        "risk_level": "low"
+      },
+      "contact_person": {
+        "full_name": "Петров Петр Петрович",
+        "phone": "+7 (999) 111-22-33",
+        "email": "petrov@romashka.ru",
+        "position": "Генеральный директор"
+      }
+    },
+    {
+      "contractor_id": "cont_002",
+      "legal_name": "ООО \"Василек\"",
+      "inn": "7702345678",
+      "kpp": "770201001",
+      "ogrn": "1027702345678",
+      "legal_address": "109012, г. Москва, ул. Ильинка, д. 2",
+      "cooperation": {
+        "start_date": "2019-06-20",
+        "is_active": true,
+        "turnover_current_year": 3200000.00,
+        "deals_count": 85,
+        "last_payment_date": "2026-02-08"
+      },
+      "status": {
+        "has_debt": false,
+        "debt_amount": 0.00,
+        "documents_status": "complete",
+        "risk_level": "low"
+      },
+      "contact_person": {
+        "full_name": "Иванова Анна Сергеевна",
+        "phone": "+7 (999) 222-33-44",
+        "email": "ivanova@vasilek.ru",
+        "position": "Финансовый директор"
+      }
+    },
+    {
+      "contractor_id": "cont_003",
+      "legal_name": "ООО \"Техносила\"",
+      "inn": "7703456789",
+      "kpp": "770301001",
+      "ogrn": "1027703456789",
+      "legal_address": "115054, г. Москва, ул. Дубининская, д. 3",
+      "cooperation": {
+        "start_date": "2021-01-10",
+        "is_active": true,
+        "turnover_current_year": 8900000.00,
+        "deals_count": 234,
+        "last_payment_date": "2026-02-12"
+      },
+      "status": {
+        "has_debt": true,
+        "debt_amount": 150000.00,
+        "documents_status": "complete",
+        "risk_level": "medium"
+      },
+      "contact_person": {
+        "full_name": "Сидоров Игорь Владимирович",
+        "phone": "+7 (999) 333-44-55",
+        "email": "sidorov@tehnosila.ru",
+        "position": "Коммерческий директор"
+      }
+    }
+  ],
+  "sample_vacations": [
+    {
+      "vacation_id": "vac_001",
+      "employee_id": "emp_001",
+      "year": 2026,
+      "start_date": "2026-07-15",
+      "end_date": "2026-07-28",
+      "days": 14,
+      "status": "approved",
+      "approved_by": "emp_manager_01",
+      "approved_at": "2026-06-01T14:30:00Z",
+      "created_at": "2026-05-25T10:00:00Z"
+    },
+    {
+      "vacation_id": "vac_002",
+      "employee_id": "emp_003",
+      "year": 2026,
+      "start_date": "2026-08-01",
+      "end_date": "2026-08-14",
+      "days": 14,
+      "status": "pending",
+      "approved_by": null,
+      "approved_at": null,
+      "created_at": "2026-07-15T11:30:00Z"
+    },
+    {
+      "vacation_id": "vac_003",
+      "employee_id": "emp_004",
+      "year": 2026,
+      "start_date": "2026-06-10",
+      "end_date": "2026-06-16",
+      "days": 7,
+      "status": "approved",
+      "approved_by": "emp_manager_02",
+      "approved_at": "2026-05-28T16:00:00Z",
+      "created_at": "2026-05-20T09:15:00Z"
+    }
+  ],
+  "sample_vacation_balances": [
+    {
+      "employee_id": "emp_001",
+      "year": 2026,
+      "total_days": 28,
+      "used_days": 7,
+      "remaining_days": 21,
+      "planned_days": 14,
+      "last_updated": "2026-02-16T00:00:00Z"
+    },
+    {
+      "employee_id": "emp_002",
+      "year": 2026,
+      "total_days": 28,
+      "used_days": 0,
+      "remaining_days": 28,
+      "planned_days": 0,
+      "last_updated": "2026-02-16T00:00:00Z"
+    },
+    {
+      "employee_id": "emp_003",
+      "year": 2026,
+      "total_days": 28,
+      "used_days": 5,
+      "remaining_days": 23,
+      "planned_days": 14,
+      "last_updated": "2026-02-16T00:00:00Z"
+    },
+    {
+      "employee_id": "emp_004",
+      "year": 2026,
+      "total_days": 28,
+      "used_days": 7,
+      "remaining_days": 21,
+      "planned_days": 0,
+      "last_updated": "2026-02-16T00:00:00Z"
+    }
+  ],
+  "sample_sessions": [
+    {
+      "session_id": "sess_abc123xyz",
+      "user_id": "max_user_001",
+      "state": "MAIN_MENU",
+      "context": {
+        "last_action": "menu_view",
+        "timestamp": "2026-02-16T10:30:00Z"
+      },
+      "created_at": "2026-02-16T10:00:00Z",
+      "expires_at": "2026-02-16T18:00:00Z",
+      "last_activity": "2026-02-16T10:30:00Z"
+    },
+    {
+      "session_id": "sess_def456uvw",
+      "user_id": "max_user_002",
+      "state": "SEARCH_EMPLOYEE_INPUT",
+      "context": {
+        "last_action": "search_initiated",
+        "timestamp": "2026-02-16T11:00:00Z"
+      },
+      "created_at": "2026-02-16T10:45:00Z",
+      "expires_at": "2026-02-16T18:45:00Z",
+      "last_activity": "2026-02-16T11:00:00Z"
+    }
+  ],
+  "sample_audit_logs": [
+    {
+      "log_id": "log_001",
+      "user_id": "max_user_001",
+      "action": "wifi_password_view",
+      "resource_type": "wifi_network",
+      "resource_id": "wifi_001",
+      "details": {
+        "network_ssid": "Onlanta_Corporate",
+        "office": "Москва"
+      },
+      "ip_address": "10.0.1.45",
+      "timestamp": "2026-02-16T10:45:00Z"
+    },
+    {
+      "log_id": "log_002",
+      "user_id": "max_user_002",
+      "action": "employee_search",
+      "resource_type": "employee",
+      "resource_id": null,
+      "details": {
+        "search_query": "Иванов",
+        "results_count": 1
+      },
+      "ip_address": "10.0.1.46",
+      "timestamp": "2026-02-16T11:00:00Z"
+    },
+    {
+      "log_id": "log_003",
+      "user_id": "max_user_003",
+      "action": "contractor_report_view",
+      "resource_type": "contractor",
+      "resource_id": "cont_001",
+      "details": {
+        "contractor_inn": "7701234567",
+        "contractor_name": "ООО \"Ромашка\""
+      },
+      "ip_address": "10.0.1.47",
+      "timestamp": "2026-02-15T16:45:00Z"
+    }
+  ],
+  "sample_resources": [
+    {
+      "resource_id": "res_001",
+      "title": "🌐 Интранет",
+      "url": "https://intranet.onlanta.com",
+      "description": "Корпоративный портал компании",
+      "category": "Основные",
+      "icon": "🌐",
+      "order": 1,
+      "is_active": true,
+      "access_roles": ["all"],
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-02-15T12:00:00Z"
+    },
+    {
+      "resource_id": "res_002",
+      "title": "📧 Корпоративная почта",
+      "url": "https://mail.onlanta.com",
+      "description": "Почтовая система компании",
+      "category": "Основные",
+      "icon": "📧",
+      "order": 2,
+      "is_active": true,
+      "access_roles": ["all"],
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-02-15T12:00:00Z"
+    },
+    {
+      "resource_id": "res_003",
+      "title": "📊 Битрикс24",
+      "url": "https://bitrix.onlanta.com",
+      "description": "CRM-система и управление задачами",
+      "category": "Работа",
+      "icon": "📊",
+      "order": 3,
+      "is_active": true,
+      "access_roles": ["all"],
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-02-15T12:00:00Z"
+    }
+  ],
+  "sample_wifi_networks": [
+    {
+      "network_id": "wifi_001",
+      "office": "Москва, БЦ \"Онланта\"",
+      "ssid": "Onlanta_Corporate",
+      "password": "Secure2026Pass!",
+      "type": "corporate",
+      "security": "WPA2-Enterprise",
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-15T00:00:00Z"
+    },
+    {
+      "network_id": "wifi_002",
+      "office": "Москва, БЦ \"Онланта\"",
+      "ssid": "Onlanta_Guest",
+      "password": "Guest2026!",
+      "type": "guest",
+      "security": "WPA2-PSK",
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-15T00:00:00Z"
+    }
+  ],
+  "sample_manager_subordinates": [
+    {
+      "manager_id": "emp_manager_01",
+      "manager_name": "Петрова Анна Сергеевна",
+      "subordinates": [
+        {
+          "employee_id": "emp_001",
+          "full_name": "Иванов Иван Иванович",
+          "position": "Старший разработчик",
+          "status": "working",
+          "on_vacation": false
+        },
+        {
+          "employee_id": "emp_003",
+          "full_name": "Сидоров Петр Александрович",
+          "position": "Разработчик",
+          "status": "on_vacation",
+          "on_vacation": true,
+          "vacation_until": "2026-08-14"
+        },
+        {
+          "employee_id": "emp_007",
+          "full_name": "Волков Дмитрий Сергеевич",
+          "position": "DevOps инженер",
+          "status": "working",
+          "on_vacation": false
+        }
+      ]
+    },
+    {
+      "manager_id": "emp_manager_02",
+      "manager_name": "Морозова Ольга Андреевна",
+      "subordinates": [
+        {
+          "employee_id": "emp_004",
+          "full_name": "Смирнова Мария Петровна",
+          "position": "HR-менеджер",
+          "status": "working",
+          "on_vacation": false
+        }
+      ]
+    }
+  ],
+  "test_scenarios": {
+    "auth_flow": {
+      "description": "Тестовый сценарий авторизации",
+      "steps": [
+        {
+          "step": 1,
+          "action": "user_sends_start",
+          "command": "/start",
+          "expected_response": "welcome_message",
+          "expected_buttons": ["Начать"]
+        },
+        {
+          "step": 2,
+          "action": "user_clicks_start_button",
+          "callback_data": "auth_start",
+          "expected_response": "auth_success",
+          "expected_next_state": "MAIN_MENU"
+        }
+      ]
+    },
+    "search_employee": {
+      "description": "Тестовый сценарий поиска сотрудника",
+      "steps": [
+        {
+          "step": 1,
+          "action": "user_clicks_search_employees",
+          "callback_data": "menu_search_employees",
+          "expected_response": "search_employee_prompt",
+          "expected_state": "SEARCH_EMPLOYEE_INPUT"
+        },
+        {
+          "step": 2,
+          "action": "user_enters_lastname",
+          "text": "Иванов",
+          "expected_response": "employee_details",
+          "expected_data": {
+            "full_name": "Иванов Иван Иванович",
+            "department": "IT-департамент"
+          }
+        }
+      ]
+    },
+    "view_resources": {
+      "description": "Тестовый сценарий просмотра ресурсов",
+      "steps": [
+        {
+          "step": 1,
+          "action": "user_clicks_resources",
+          "callback_data": "menu_company_resources",
+          "expected_response": "resources_page_1",
+          "expected_buttons": ["Следующая ➡️", "🏠 Главное меню"]
+        },
+        {
+          "step": 2,
+          "action": "user_clicks_next_page",
+          "callback_data": "resources_page_2",
+          "expected_response": "resources_page_2",
+          "expected_buttons": ["⬅️ Предыдущая", "Следующая ➡️", "🏠 Главное меню"]
+        }
+      ]
+    }
+  }
+}

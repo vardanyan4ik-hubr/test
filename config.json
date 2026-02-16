@@ -1,0 +1,468 @@
+{
+  "bot_config": {
+    "bot_name": "Михалыч",
+    "version": "1.0.0",
+    "description": "Корпоративный чат-бот компании Онланта для мессенджера MAX",
+    "support_email": "support@onlanta.com",
+    "dev_email": "dev@onlanta.com"
+  },
+  "session_config": {
+    "session_lifetime_hours": 8,
+    "max_inactive_minutes": 30,
+    "session_cleanup_interval_minutes": 60
+  },
+  "rate_limiting": {
+    "max_requests_per_minute": 30,
+    "max_requests_per_hour": 500,
+    "block_duration_minutes": 15
+  },
+  "pagination": {
+    "resources_per_page": 5,
+    "employees_per_page": 10,
+    "contractors_per_page": 10
+  },
+  "validation_rules": {
+    "lastname": {
+      "min_length": 2,
+      "max_length": 50,
+      "pattern": "^[А-Яа-яA-Za-z\\s\\-]+$",
+      "error_message": "Фамилия должна содержать от 2 до 50 символов и состоять только из букв, пробелов и дефисов"
+    },
+    "inn_legal": {
+      "length": 10,
+      "pattern": "^\\d{10}$",
+      "error_message": "ИНН юридического лица должен содержать 10 цифр"
+    },
+    "inn_individual": {
+      "length": 12,
+      "pattern": "^\\d{12}$",
+      "error_message": "ИНН физического лица должен содержать 12 цифр"
+    }
+  },
+  "messages": {
+    "welcome_message": "👋 Привет, Я — *MAX-версия Михалыча*. Корпоративный чат-бот компании Онланта.\n\n🔐 Для начала работы мне нужно вас авторизовать.\n\n✅ Нажмите кнопку «Начать», чтобы продолжить.",
+    "main_menu_message": "🏠 *Главное меню*\n\nВыберите нужный раздел:",
+    "search_employee_prompt": "🔍 *Поиск сотрудников*\n\nВведите фамилию сотрудника для поиска:",
+    "resources_page_title": "📚 *Ресурсы компании*\n\nСтраница {page} из {total}",
+    "vacation_info_message": "🌴 *Информация об отпусках*\n\nВсего у тебя 28 календарных дней отпуска в году (если ты их не отгуляешь, они переносятся на следующий год).\n\nОдна часть твоего отпуска должна составлять 14 календарных дней единовременно.\n\n*Чтобы пойти в отпуск тебе нужно:*\n\n1️⃣ Предварительно согласовать даты отпуска с руководителем, чтобы не было пересечений с другими коллегами.\n\n2️⃣ Завести заявку на Интранете в разделе \"Отпуска и отсутствия\". Не позднее, чем за 6 рабочих дней ты должен получить согласование руководителя.\n\n3️⃣ Жди отпускные не позднее, чем за 3 дня до отпуска.",
+    "access_denied_manager": "⛔ *Доступ ограничен*\n\nЭтот раздел доступен только руководителям.",
+    "access_denied_general": "⛔ *Доступ ограничен*\n\nУ вас нет прав для выполнения этого действия.",
+    "error_validation": "❌ *Ошибка ввода*\n\n{error_details}\n\nПопробуйте снова.",
+    "error_not_found": "❌ *Не найдено*\n\nНе удалось найти информацию по вашему запросу.\n\nПроверьте правильность введенных данных.",
+    "error_internal": "⚠️ *Временная ошибка*\n\nНе удалось выполнить запрос. Попробуйте снова через несколько минут.\n\nЕсли проблема сохраняется, обратитесь в техподдержку.",
+    "module_unavailable": "⏸️ Этот раздел временно недоступен и находится в разработке."
+  },
+  "menu_items": [
+    {
+      "id": "search_employees",
+      "label": "🔍 Поиск сотрудников",
+      "callback_data": "menu_search_employees",
+      "enabled": true,
+      "order": 1,
+      "required_role": "all"
+    },
+    {
+      "id": "company_resources",
+      "label": "📚 Ресурсы компании",
+      "callback_data": "menu_company_resources",
+      "enabled": true,
+      "order": 2,
+      "required_role": "all"
+    },
+    {
+      "id": "sib_help",
+      "label": "🛡️ Помощь СИБ",
+      "callback_data": "menu_sib_help",
+      "enabled": false,
+      "disabled_text": "(временно недоступно)",
+      "order": 3,
+      "required_role": "all"
+    },
+    {
+      "id": "vacation",
+      "label": "🌴 Хочу в отпуск",
+      "callback_data": "menu_vacation",
+      "enabled": true,
+      "order": 4,
+      "required_role": "all"
+    },
+    {
+      "id": "training",
+      "label": "🏋️ Загрузить тренировку",
+      "callback_data": "menu_training",
+      "enabled": false,
+      "disabled_text": "(временно недоступно)",
+      "order": 5,
+      "required_role": "all"
+    },
+    {
+      "id": "ping_pong",
+      "label": "🏓 Пин-понг",
+      "callback_data": "menu_ping_pong",
+      "enabled": false,
+      "disabled_text": "(временно недоступно)",
+      "order": 6,
+      "required_role": "all"
+    },
+    {
+      "id": "wifi_password",
+      "label": "📶 Показать пароль Wi-Fi",
+      "callback_data": "menu_wifi_password",
+      "enabled": true,
+      "order": 7,
+      "required_role": "all"
+    },
+    {
+      "id": "manager_section",
+      "label": "👔 Руководителю",
+      "callback_data": "menu_manager_section",
+      "enabled": true,
+      "order": 8,
+      "required_role": "manager"
+    },
+    {
+      "id": "contractor_report",
+      "label": "📊 Экспресс-отчет по контрагенту",
+      "callback_data": "menu_contractor_report",
+      "enabled": true,
+      "order": 9,
+      "required_role": "all"
+    }
+  ],
+  "company_resources": [
+    {
+      "resource_id": "res_001",
+      "title": "🌐 Интранет",
+      "url": "https://intranet.onlanta.com",
+      "description": "Корпоративный портал компании",
+      "category": "Основные",
+      "icon": "🌐",
+      "order": 1,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_002",
+      "title": "📧 Корпоративная почта",
+      "url": "https://mail.onlanta.com",
+      "description": "Почтовая система компании",
+      "category": "Основные",
+      "icon": "📧",
+      "order": 2,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_003",
+      "title": "📊 Битрикс24",
+      "url": "https://bitrix.onlanta.com",
+      "description": "CRM-система и управление задачами",
+      "category": "Работа",
+      "icon": "📊",
+      "order": 3,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_004",
+      "title": "💰 1С Зарплата",
+      "url": "https://1c.onlanta.com",
+      "description": "Система учета зарплат и кадров",
+      "category": "Финансы",
+      "icon": "💰",
+      "order": 4,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_005",
+      "title": "📚 База знаний",
+      "url": "https://kb.onlanta.com",
+      "description": "Корпоративная документация и инструкции",
+      "category": "Обучение",
+      "icon": "📚",
+      "order": 5,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_006",
+      "title": "🎓 Учебный портал",
+      "url": "https://learning.onlanta.com",
+      "description": "Онлайн-курсы и тренинги для сотрудников",
+      "category": "Обучение",
+      "icon": "🎓",
+      "order": 6,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_007",
+      "title": "📝 Заявки на отпуск",
+      "url": "https://intranet.onlanta.com/vacation",
+      "description": "Подать заявку на отпуск",
+      "category": "Кадры",
+      "icon": "📝",
+      "order": 7,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_008",
+      "title": "🏥 ДМС",
+      "url": "https://intranet.onlanta.com/dms",
+      "description": "Информация о добровольном медицинском страховании",
+      "category": "Соцпакет",
+      "icon": "🏥",
+      "order": 8,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_009",
+      "title": "🍽️ Доставка обедов",
+      "url": "https://intranet.onlanta.com/lunch",
+      "description": "Заказ корпоративных обедов",
+      "category": "Соцпакет",
+      "icon": "🍽️",
+      "order": 9,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_010",
+      "title": "🚗 Заказ такси",
+      "url": "https://intranet.onlanta.com/taxi",
+      "description": "Корпоративное такси для сотрудников",
+      "category": "Соцпакет",
+      "icon": "🚗",
+      "order": 10,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_011",
+      "title": "💻 Техподдержка",
+      "url": "https://helpdesk.onlanta.com",
+      "description": "Служба технической поддержки",
+      "category": "Поддержка",
+      "icon": "💻",
+      "order": 11,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_012",
+      "title": "🛡️ Служба безопасности",
+      "url": "https://intranet.onlanta.com/security",
+      "description": "Служба информационной безопасности",
+      "category": "Поддержка",
+      "icon": "🛡️",
+      "order": 12,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_013",
+      "title": "📊 Отчетность",
+      "url": "https://reports.onlanta.com",
+      "description": "Система отчетности и аналитики",
+      "category": "Работа",
+      "icon": "📊",
+      "order": 13,
+      "is_active": true,
+      "access_roles": ["manager", "finance"]
+    },
+    {
+      "resource_id": "res_014",
+      "title": "👥 HR-портал",
+      "url": "https://hr.onlanta.com",
+      "description": "Кадровая информация и документы",
+      "category": "Кадры",
+      "icon": "👥",
+      "order": 14,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_015",
+      "title": "🎉 Корпоративные мероприятия",
+      "url": "https://intranet.onlanta.com/events",
+      "description": "Расписание и регистрация на мероприятия",
+      "category": "Соцпакет",
+      "icon": "🎉",
+      "order": 15,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_016",
+      "title": "📱 Мобильное приложение",
+      "url": "https://intranet.onlanta.com/mobile-app",
+      "description": "Скачать мобильное приложение компании",
+      "category": "Основные",
+      "icon": "📱",
+      "order": 16,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_017",
+      "title": "📞 Телефонный справочник",
+      "url": "https://intranet.onlanta.com/phonebook",
+      "description": "Внутренние номера и контакты",
+      "category": "Основные",
+      "icon": "📞",
+      "order": 17,
+      "is_active": true,
+      "access_roles": ["all"]
+    },
+    {
+      "resource_id": "res_018",
+      "title": "🗺️ Карта офисов",
+      "url": "https://intranet.onlanta.com/offices",
+      "description": "Расположение офисов компании",
+      "category": "Основные",
+      "icon": "🗺️",
+      "order": 18,
+      "is_active": true,
+      "access_roles": ["all"]
+    }
+  ],
+  "wifi_networks": [
+    {
+      "network_id": "wifi_001",
+      "office": "Москва, БЦ \"Онланта\"",
+      "ssid": "Onlanta_Corporate",
+      "password": "Secure2026Pass!",
+      "type": "corporate",
+      "security": "WPA2-Enterprise",
+      "is_active": true
+    },
+    {
+      "network_id": "wifi_002",
+      "office": "Москва, БЦ \"Онланта\"",
+      "ssid": "Onlanta_Guest",
+      "password": "Guest2026!",
+      "type": "guest",
+      "security": "WPA2-PSK",
+      "is_active": true
+    },
+    {
+      "network_id": "wifi_003",
+      "office": "Санкт-Петербург, БЦ \"Северная Столица\"",
+      "ssid": "Onlanta_SPB_Corporate",
+      "password": "SecureSPB2026!",
+      "type": "corporate",
+      "security": "WPA2-Enterprise",
+      "is_active": true
+    },
+    {
+      "network_id": "wifi_004",
+      "office": "Санкт-Петербург, БЦ \"Северная Столица\"",
+      "ssid": "Onlanta_SPB_Guest",
+      "password": "GuestSPB2026!",
+      "type": "guest",
+      "security": "WPA2-PSK",
+      "is_active": true
+    }
+  ],
+  "vacation_rules": {
+    "total_days_per_year": 28,
+    "min_continuous_days": 14,
+    "request_days_before": 6,
+    "payment_days_before": 3,
+    "max_parts_per_year": 3,
+    "carry_over_to_next_year": true
+  },
+  "logging": {
+    "log_level": "INFO",
+    "log_to_file": true,
+    "log_to_console": true,
+    "log_rotation": "daily",
+    "log_retention_days": 30,
+    "sensitive_fields": [
+      "password",
+      "token",
+      "secret",
+      "api_key"
+    ]
+  },
+  "integrations": {
+    "max_api": {
+      "base_url": "https://api.max.messenger.com",
+      "api_version": "v1",
+      "timeout_seconds": 30,
+      "retry_attempts": 3
+    },
+    "hr_system": {
+      "base_url": "https://hr.onlanta.com/api",
+      "api_version": "v2",
+      "timeout_seconds": 15,
+      "retry_attempts": 2
+    },
+    "1c_api": {
+      "base_url": "https://1c.onlanta.com/api",
+      "api_version": "v1",
+      "timeout_seconds": 20,
+      "retry_attempts": 3
+    }
+  },
+  "security": {
+    "password_encryption": "AES-256",
+    "tls_version": "1.3",
+    "session_token_length": 64,
+    "max_failed_login_attempts": 5,
+    "lockout_duration_minutes": 15,
+    "require_audit_logging": [
+      "wifi_password_view",
+      "contractor_report_view",
+      "employee_search",
+      "vacation_info_view"
+    ]
+  },
+  "features": {
+    "employee_search": {
+      "enabled": true,
+      "max_results": 10
+    },
+    "company_resources": {
+      "enabled": true,
+      "pagination": true
+    },
+    "sib_help": {
+      "enabled": false,
+      "planned_release": "2026-Q2"
+    },
+    "vacation_info": {
+      "enabled": true,
+      "show_balance": true,
+      "integration_1c": true
+    },
+    "training_upload": {
+      "enabled": false,
+      "planned_release": "2026-Q3"
+    },
+    "ping_pong": {
+      "enabled": false,
+      "planned_release": "2026-Q3"
+    },
+    "wifi_password": {
+      "enabled": true,
+      "require_audit": true
+    },
+    "manager_section": {
+      "enabled": true,
+      "features": {
+        "view_subordinates": true,
+        "view_team_vacations": true,
+        "department_stats": true,
+        "approve_requests": true
+      }
+    },
+    "contractor_report": {
+      "enabled": true,
+      "require_audit": true
+    }
+  }
+}
