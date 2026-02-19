@@ -66,22 +66,27 @@
 
 ### 2.2. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant U as Пользователь
-    participant B as Бот MAX
-    participant DB as БД бота
+```plantuml
+@startuml
+title Модуль согласия на обработку ПДн
 
-    U->>B: Нажимает «Начать»
-    B-->>U: Запрос согласия на обработку ПДн
-    alt Пользователь согласен
-        U->>B: Нажимает «Да»
-        B->>DB: Сохранить согласие (факт + дата)
-        DB-->>B: OK
-        B-->>U: Переход к экрану авторизации
-    else Пользователь не согласен
-        Note over U,B: Дальнейшая работа невозможна
-    end
+actor "Пользователь" as U
+participant "Бот MAX" as B
+database "БД бота" as DB
+
+U -> B : Нажимает «Начать»
+B --> U : Запрос согласия на обработку ПДн
+
+alt Пользователь согласен
+    U -> B : Нажимает «Да»
+    B -> DB : Сохранить согласие (факт + дата)
+    DB --> B : OK
+    B --> U : Переход к экрану авторизации
+else Пользователь не согласен
+    note over U, B : Дальнейшая работа невозможна
+end
+
+@enduml
 ```
 
 ---
@@ -182,55 +187,61 @@ sequenceDiagram
 
 ### 3.5. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant U as Пользователь
-    participant B as Бот MAX
-    participant A as API Apex
-    participant S as SMTP
-    participant DB as БД бота
+```plantuml
+@startuml
+title Модуль авторизации
 
-    U->>B: /start
-    B-->>U: 🔐 Экран авторизации
+actor "Пользователь" as U
+participant "Бот MAX" as B
+participant "API Apex" as A
+participant "SMTP" as S
+database "БД бота" as DB
 
-    U->>B: 📧 Авторизация по email
-    B-->>U: Введите корпоративный email
+U -> B : /start
+B --> U : Экран авторизации
 
-    U->>B: name@company.com
-    B->>A: Проверка email
-    alt Пользователь найден
-        A-->>B: OK (данные пользователя)
-        B->>B: Генерация 4-значного кода
-        B->>S: Отправка кода на email
-        S-->>B: OK
-        B-->>U: Код отправлен. Введите код.
+U -> B : Авторизация по email
+B --> U : Введите корпоративный email
 
-        U->>B: Ввод 4-значного кода
-        alt Код верный
-            B->>DB: Сохранить привязку email ↔ chat_id
-            DB-->>B: OK
-            B-->>U: ✅ Авторизация успешна!
-            B->>A: Запрос списка проектов
-            A-->>B: Список проектов
-            B-->>U: Выберите проект
-            U->>B: Выбор проекта
-            B->>DB: Сохранить выбранный проект
-            B-->>U: Главное меню
-        else Код неверный (попытка 1-2)
-            B-->>U: ❌ Неверный код. Осталось попыток: N
-        else Код неверный (попытка 3)
-            B->>DB: Блокировка на 5 минут
-            B-->>U: ❌ Превышено количество попыток
-        end
+U -> B : name@company.com
+B -> A : Проверка email
 
-    else Пользователь не найден (попытка 1)
-        A-->>B: Не найден
-        B-->>U: ❌ Не найден. Кнопка: 📧 ДРУГОЙ EMAIL
+alt Пользователь найден
+    A --> B : OK (данные пользователя)
+    B -> B : Генерация 4-значного кода
+    B -> S : Отправка кода на email
+    S --> B : OK
+    B --> U : Код отправлен. Введите код.
 
-    else Пользователь не найден (попытка 2)
-        A-->>B: Не найден
-        B-->>U: ❌ Обратитесь к РП для доступа
+    U -> B : Ввод 4-значного кода
+
+    alt Код верный
+        B -> DB : Сохранить привязку email <-> chat_id
+        DB --> B : OK
+        B --> U : Авторизация успешна!
+        B -> A : Запрос списка проектов
+        A --> B : Список проектов
+        B --> U : Выберите проект
+        U -> B : Выбор проекта
+        B -> DB : Сохранить выбранный проект
+        B --> U : Главное меню
+    else Код неверный (попытка 1–2)
+        B --> U : Неверный код. Осталось попыток: N
+    else Код неверный (попытка 3)
+        B -> DB : Блокировка на 5 минут
+        B --> U : Превышено количество попыток
     end
+
+else Пользователь не найден (попытка 1)
+    A --> B : Не найден
+    B --> U : Не найден. Кнопка: ДРУГОЙ EMAIL
+
+else Пользователь не найден (попытка 2)
+    A --> B : Не найден
+    B --> U : Обратитесь к РП для доступа
+end
+
+@enduml
 ```
 
 ---
@@ -346,48 +357,52 @@ sequenceDiagram
 
 ### 5.5. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant U as Пользователь
-    participant B as Бот MAX
-    participant A as API Apex
-    participant DB as БД бота
-    participant AS as Assyst
+```plantuml
+@startuml
+title Модуль создания заявок
 
-    U->>B: 📋 Создать заявку
-    B->>A: Проверка актуальности пользователя
-    A-->>B: OK
-    B->>DB: Проверка лимитов (час / сутки / интервал)
-    DB-->>B: Лимиты не превышены
+actor "Пользователь" as U
+participant "Бот MAX" as B
+participant "API Apex" as A
+database "БД бота" as DB
+participant "Assyst" as AS
 
-    B-->>U: 📝 Инструкция по созданию заявки
+U -> B : Создать заявку
+B -> A : Проверка актуальности пользователя
+A --> B : OK
+B -> DB : Проверка лимитов (час / сутки / интервал)
+DB --> B : Лимиты не превышены
 
-    U->>B: Текст описания + фотографии
-    B->>B: Валидация (длина, качество, файлы)
+B --> U : Инструкция по созданию заявки
 
-    alt Валидация пройдена
-        B-->>U: 📋 Предпросмотр заявки
+U -> B : Текст описания + фотографии
+B -> B : Валидация (длина, качество, файлы)
 
-        alt Пользователь подтверждает
-            U->>B: ✅ Подтвердить создание
-            B->>AS: Передача заявки
-            AS-->>B: OK
-            B->>DB: Сохранение заявки
-            DB-->>B: OK
-            B-->>U: ✅ Заявка успешно создана!
+alt Валидация пройдена
+    B --> U : Предпросмотр заявки
 
-        else Пользователь редактирует
-            U->>B: ✏️ Редактировать описание
-            B-->>U: Возврат к вводу описания
+    alt Пользователь подтверждает
+        U -> B : Подтвердить создание
+        B -> AS : Передача заявки
+        AS --> B : OK
+        B -> DB : Сохранение заявки
+        DB --> B : OK
+        B --> U : Заявка успешно создана!
 
-        else Пользователь отменяет
-            U->>B: ❌ Отменить заявку
-            B-->>U: ❌ Создание заявки отменено
-        end
+    else Пользователь редактирует
+        U -> B : Редактировать описание
+        B --> U : Возврат к вводу описания
 
-    else Валидация не пройдена
-        B-->>U: ❌ Ошибка валидации. Введите повторно.
+    else Пользователь отменяет
+        U -> B : Отменить заявку
+        B --> U : Создание заявки отменено
     end
+
+else Валидация не пройдена
+    B --> U : Ошибка валидации. Введите повторно.
+end
+
+@enduml
 ```
 
 ---
@@ -479,36 +494,40 @@ sequenceDiagram
 
 ### 7.3. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant U as Пользователь
-    participant B as Бот MAX
-    participant DB as БД бота
+```plantuml
+@startuml
+title Модуль просмотра заявок
 
-    U->>B: /myrequests
-    B->>DB: Запрос заявок по chat_id
-    DB-->>B: Список заявок
+actor "Пользователь" as U
+participant "Бот MAX" as B
+database "БД бота" as DB
 
-    alt Заявки найдены
-        B-->>U: Постраничный список заявок
-        U->>B: Нажатие на 📋 R-1234567
-        B->>DB: Запрос деталей заявки
-        DB-->>B: Детали заявки
-        B-->>U: Карточка заявки (статус, проект, описание)
+U -> B : /myrequests
+B -> DB : Запрос заявок по chat_id
+DB --> B : Список заявок
 
-        U->>B: 🗂 Назад к списку
-        B-->>U: Постраничный список заявок
+alt Заявки найдены
+    B --> U : Постраничный список заявок
+    U -> B : Нажатие на R-1234567
+    B -> DB : Запрос деталей заявки
+    DB --> B : Детали заявки
+    B --> U : Карточка заявки (статус, проект, описание)
 
-        opt Пагинация
-            U->>B: Следующая ▶️
-            B->>DB: Запрос следующей страницы
-            DB-->>B: Заявки (страница N)
-            B-->>U: Обновлённый список
-        end
+    U -> B : Назад к списку
+    B --> U : Постраничный список заявок
 
-    else Заявок нет
-        B-->>U: У вас пока нет заявок
+    opt Пагинация
+        U -> B : Следующая страница
+        B -> DB : Запрос следующей страницы
+        DB --> B : Заявки (страница N)
+        B --> U : Обновлённый список
     end
+
+else Заявок нет
+    B --> U : У вас пока нет заявок
+end
+
+@enduml
 ```
 
 ---
@@ -580,20 +599,24 @@ Assyst отправляет POST-запросы на эндпоинт бота �
 
 #### 8.2.5. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant AS as Assyst
-    participant B as Бот MAX
-    participant DB as БД бота
-    participant U as Пользователь
+```plantuml
+@startuml
+title Webhook: Создание заявки (type: new)
 
-    AS->>B: POST /itsm-bot/webhook (type: new)
-    B->>DB: Создать запись о заявке
-    DB-->>B: OK
-    B->>DB: Найти chat_id по email
-    DB-->>B: chat_id
-    B-->>U: ✅ Ваше обращение зарегистрировано. Номер R12345.
-    B-->>AS: 201 Created
+participant "Assyst" as AS
+participant "Бот MAX" as B
+database "БД бота" as DB
+actor "Пользователь" as U
+
+AS -> B : POST /itsm-bot/webhook\n(type: new)
+B -> DB : Создать запись о заявке
+DB --> B : OK
+B -> DB : Найти chat_id по email
+DB --> B : chat_id
+B --> U : Ваше обращение зарегистрировано.\nНомер R12345.
+B --> AS : 201 Created
+
+@enduml
 ```
 
 ---
@@ -644,22 +667,26 @@ sequenceDiagram
 
 #### 8.3.5. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant AS as Assyst
-    participant B as Бот MAX
-    participant DB as БД бота
-    participant U as Пользователь
+```plantuml
+@startuml
+title Webhook: Остановка таймера (type: clockstop)
 
-    AS->>B: POST /itsm-bot/webhook (type: clockstop)
-    B->>DB: Найти заявку по incidentId
-    DB-->>B: Заявка найдена
-    B->>DB: Обновить статус → «В ожидании», сохранить statusdesc
-    DB-->>B: OK
-    B->>DB: Найти chat_id по email
-    DB-->>B: chat_id
-    B-->>U: 🔔 Статус изменился: В ожидании (причина)
-    B-->>AS: 200 OK
+participant "Assyst" as AS
+participant "Бот MAX" as B
+database "БД бота" as DB
+actor "Пользователь" as U
+
+AS -> B : POST /itsm-bot/webhook\n(type: clockstop)
+B -> DB : Найти заявку по incidentId
+DB --> B : Заявка найдена
+B -> DB : Обновить статус -> «В ожидании»,\nсохранить statusdesc
+DB --> B : OK
+B -> DB : Найти chat_id по email
+DB --> B : chat_id
+B --> U : Статус изменился: В ожидании\n(причина)
+B --> AS : 200 OK
+
+@enduml
 ```
 
 ---
@@ -706,22 +733,26 @@ sequenceDiagram
 
 #### 8.4.5. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant AS as Assyst
-    participant B as Бот MAX
-    participant DB as БД бота
-    participant U as Пользователь
+```plantuml
+@startuml
+title Webhook: Запуск таймера (type: clockstart)
 
-    AS->>B: POST /itsm-bot/webhook (type: clockstart)
-    B->>DB: Найти заявку по incidentId
-    DB-->>B: Заявка найдена
-    B->>DB: Обновить статус → «В работе», очистить statusdesc
-    DB-->>B: OK
-    B->>DB: Найти chat_id по email
-    DB-->>B: chat_id
-    B-->>U: 🔔 Статус изменился: В работе
-    B-->>AS: 200 OK
+participant "Assyst" as AS
+participant "Бот MAX" as B
+database "БД бота" as DB
+actor "Пользователь" as U
+
+AS -> B : POST /itsm-bot/webhook\n(type: clockstart)
+B -> DB : Найти заявку по incidentId
+DB --> B : Заявка найдена
+B -> DB : Обновить статус -> «В работе»,\nочистить statusdesc
+DB --> B : OK
+B -> DB : Найти chat_id по email
+DB --> B : chat_id
+B --> U : Статус изменился: В работе
+B --> AS : 200 OK
+
+@enduml
 ```
 
 ---
@@ -815,42 +846,46 @@ sequenceDiagram
 
 #### 8.5.6. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant AS as Assyst
-    participant B as Бот MAX
-    participant DB as БД бота
-    participant U as Пользователь
-    participant S as SMTP
+```plantuml
+@startuml
+title Webhook: Согласование закрытия (type: confirmation)
 
-    AS->>B: POST /itsm-bot/webhook (type: confirmation)
-    B->>DB: Обновить статус → «Согласование закрытия»
-    B->>DB: Сохранить данные confirmation
-    DB-->>B: OK
-    B->>DB: Найти chat_id по email
-    DB-->>B: chat_id
+participant "Assyst" as AS
+participant "Бот MAX" as B
+database "БД бота" as DB
+actor "Пользователь" as U
+participant "SMTP" as S
 
-    opt Есть вложения
-        B-->>U: 📎 Документы (декодированные из base64)
-    end
+AS -> B : POST /itsm-bot/webhook\n(type: confirmation)
+B -> DB : Обновить статус -> «Согласование закрытия»
+B -> DB : Сохранить данные confirmation
+DB --> B : OK
+B -> DB : Найти chat_id по email
+DB --> B : chat_id
 
-    B-->>U: 🔔 Требуется согласование! [✅ / ❌]
-    B-->>AS: 200 OK
+opt Есть вложения
+    B --> U : Документы (декодированные из base64)
+end
 
-    alt Пользователь согласовывает
-        U->>B: ✅ Согласовать
-        B->>S: Email на assyst.inbox (тема: confirm)
-        S-->>B: OK
-        B-->>U: ✅ Согласование отправлено
+B --> U : Требуется согласование!\n[Согласовать / Отклонить]
+B --> AS : 200 OK
 
-    else Пользователь отклоняет
-        U->>B: ❌ Отклонить
-        B-->>U: Введите обоснование
-        U->>B: Текст обоснования
-        B->>S: Email на assyst.inbox (тема: deny, тело: обоснование)
-        S-->>B: OK
-        B-->>U: ❌ Отклонение отправлено
-    end
+alt Пользователь согласовывает
+    U -> B : Согласовать
+    B -> S : Email на assyst.inbox\n(тема: confirm)
+    S --> B : OK
+    B --> U : Согласование отправлено
+
+else Пользователь отклоняет
+    U -> B : Отклонить
+    B --> U : Введите обоснование
+    U -> B : Текст обоснования
+    B -> S : Email на assyst.inbox\n(тема: deny, тело: обоснование)
+    S --> B : OK
+    B --> U : Отклонение отправлено
+end
+
+@enduml
 ```
 
 ---
@@ -921,25 +956,29 @@ sequenceDiagram
 
 #### 8.6.5. Диаграмма последовательности
 
-```mermaid
-sequenceDiagram
-    participant AS as Assyst
-    participant B as Бот MAX
-    participant DB as БД бота
-    participant U as Пользователь
+```plantuml
+@startuml
+title Webhook: Закрытие заявки (type: closed)
 
-    AS->>B: POST /itsm-bot/webhook (type: closed)
-    B->>DB: Обновить статус → «Решено» / «Отклонено»
-    B->>DB: Пометить заявку как закрытую
-    DB-->>B: OK
-    B->>DB: Найти chat_id по email
-    DB-->>B: chat_id
-    B-->>U: ✅ Заявка R12345 — Решено + кнопки оценки (⭐1–5)
-    B-->>AS: 200 OK
+participant "Assyst" as AS
+participant "Бот MAX" as B
+database "БД бота" as DB
+actor "Пользователь" as U
 
-    opt Пользователь оценивает
-        U->>U: Нажатие на ⭐ → открытие URL в браузере
-    end
+AS -> B : POST /itsm-bot/webhook\n(type: closed)
+B -> DB : Обновить статус -> «Решено» / «Отклонено»
+B -> DB : Пометить заявку как закрытую
+DB --> B : OK
+B -> DB : Найти chat_id по email
+DB --> B : chat_id
+B --> U : Заявка R12345 — Решено\n+ кнопки оценки (1–5)
+B --> AS : 200 OK
+
+opt Пользователь оценивает
+    U -> U : Нажатие на оценку ->\nоткрытие URL в браузере
+end
+
+@enduml
 ```
 
 ---
